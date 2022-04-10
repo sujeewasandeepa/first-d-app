@@ -3,9 +3,9 @@ import { ethers } from "ethers";
 
 function App() {
 
-  const [greet, setGreet] = useState('');
+  const [greet, setGreet] = useState('hello!');
   const [balance, setBalance] = useState('');
-  const [depositValue, setDepositValue] = useState('');
+  const [depositValue, setDepositValue] = useState(0);
   const [greetingValue, setGreetingValue] = useState('');
 
 
@@ -61,7 +61,7 @@ function App() {
   ];
 
   // The Contract object
-  const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
+  const contract = new ethers.Contract(contractAddress, ABI, signer);
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -74,12 +74,20 @@ function App() {
       setBalance(balanceFormatted);
     }
 
+    const getGreeting = async () => {
+      const greeting = await contract.greet();
+      setGreet(greeting);
+    }
+
     connectWallet()
       .catch(console.error);
 
     getBalance()
       .catch(console.error);
-  })
+
+    getGreeting()
+      .catch(console.error);
+  }, [])
 
   const handleDepositChange = (e) => {
     setDepositValue(e.target.value);
@@ -94,9 +102,13 @@ function App() {
     console.log(depositValue);
   }
 
-  const handleGreetingSubmit = (e) => {
+  const handleGreetingSubmit = async (e) => {
     e.preventDefault();
-    console.log(greetingValue);
+    const greetingUpdate = await contract.setGreeting(greetingValue);
+    // wait until the transaction is complete.
+    await greetingUpdate.wait();
+    setGreet(greetingValue);
+    setGreetingValue('');
   }
 
   return (
@@ -104,7 +116,7 @@ function App() {
       <div className="container">
         <div className="row mt-5">
           <div className="col">
-            <h3>Greetings!</h3>
+            <h3>{greet}</h3>
             <p>Contract Balance: {balance}</p>
           </div>
           <div className="col">
@@ -118,7 +130,7 @@ function App() {
               <div className="mb-3">
                 <input type="text" className="form-control" onChange={handleGreetingChange} value={greetingValue} />
               </div>
-              <button type="submit" className="btn btn-dark">Deposit</button>
+              <button type="submit" className="btn btn-dark">Change</button>
             </form>
           </div>
         </div>
