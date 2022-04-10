@@ -13,29 +13,61 @@ function App() {
   const signer = provider.getSigner();
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
-const ABI = [
-  // Some details about the token
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
+  const ABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_greeting",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "greet",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_greeting",
+          "type": "string"
+        }
+      ],
+      "name": "setGreeting",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ];
 
-  // Get the account balance
-  "function balanceOf(address) view returns (uint)",
-
-  // Send some of your tokens to someone else
-  "function transfer(address to, uint amount)",
-
-  // An event triggered whenever anyone transfers to someone else
-  "event Transfer(address indexed from, address indexed to, uint amount)"
-];
-
-// The Contract object
-const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
+  // The Contract object
+  const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
 
   useEffect(() => {
     const connectWallet = async () => {
       await provider.send("eth_requestAccounts", []);
     }
-    
+
     const getBalance = async () => {
       const balance = await provider.getBalance(contractAddress);
       const balanceFormatted = ethers.utils.formatEther(balance);
