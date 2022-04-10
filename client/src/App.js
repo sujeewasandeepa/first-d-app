@@ -97,9 +97,16 @@ function App() {
     setGreetingValue(e.target.value);
   }
 
-  const handleDepositSubmit = (e) => {
+  const handleDepositSubmit = async (e) => {
     e.preventDefault();
-    console.log(depositValue);
+    const ethValue = ethers.utils.parseEther(depositValue);
+    const depositEth = await contract.deposit({ value: ethValue })
+    await depositEth.wait();
+    // getting the new balance, formatting and setting it
+    const balance = await provider.getBalance(contractAddress);
+    const balanceFormatted = ethers.utils.formatEther(balance);
+    setBalance(balanceFormatted);
+    setDepositValue(0);
   }
 
   const handleGreetingSubmit = async (e) => {
@@ -117,7 +124,7 @@ function App() {
         <div className="row mt-5">
           <div className="col">
             <h3>{greet}</h3>
-            <p>Contract Balance: {balance}</p>
+            <p>Contract Balance: {balance} ETH</p>
           </div>
           <div className="col">
             <form onSubmit={handleDepositSubmit}>
